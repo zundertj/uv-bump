@@ -19,7 +19,7 @@ For steps 2 & 3, run `uv sync` if you are unsure.
 Proceed by installing the tool and running it:
 
 ```bash
-uv git+https://github.com/zundertj/uv-bump --dev
+uv add git+https://github.com/zundertj/uv-bump --dev
 uv-bump
 ```
 UV-bump will run `uv sync`, and update your pyproject.toml file.
