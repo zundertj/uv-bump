@@ -1,0 +1,31 @@
+[project]
+name = "uv-bump"
+version = "0.1.0"
+description = "Bump pyproject.toml dependency minimum versions to latest feasible versions."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.9.6",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[project.scripts]
+uv-bump = "uv_bump.cli:cli"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["COM812", "D100", "D104", "D103", "D203", "D212"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/{tests}/*" = ["D1", "S101"]
+
+[tool.mypy]
+strict = true
