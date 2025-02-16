@@ -9,16 +9,20 @@ Please make sure your code has been backed up / committed in case something goes
 ## Howto
 
 Within your project, ensure that it is clean. That is:
+
 1. your pyproject.toml file has been versioned and contains no working changes
 2. your `uv.lock` file is up to date
 3. your `.venv` is up to date
+
 For steps 2 & 3, run `uv sync` if you are unsure.
+
+Proceed by installing the tool and running it:
 
 ```bash
 uv git+https://github.com/zundertj/uv-bump --dev
 uv-bump
 ```
-uv-bump will run `uv sync`, and update your pyproject.toml file.
+UV-bump will run `uv sync`, and update your pyproject.toml file.
 Review the changes, and if happy, commit.
 
 UV-bump will respect your currently set version pins and bounds.
@@ -45,11 +49,16 @@ Effectively, `pyproject.toml` is now outdated, your application won't work any l
 ## FAQ
 
 Q1. Help, UV-bump does not select the latest version?
+
 A1. UV-bump uses UV to resolve package requirements. It may well be that amongst your dependencies one or more are holding
    your dependency back.
 
+
 Q2. will UV add native support for this functionality?
+
 A2. See the issue tracker: https://github.com/astral-sh/uv/issues/6794
 
+
 Q3. Can I see which of my dependencies are outdated?
+
 A3. `uv pip list --outdated`. This does not, per Q1, mean that they can actually all be updated to the latest version.
