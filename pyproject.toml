@@ -1,10 +1,28 @@
 [project]
 name = "uv-bump"
-version = "0.1.0"
+version = "0.1.1"
 description = "Bump pyproject.toml dependency minimum versions to latest feasible versions."
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = []
+authors = [{ name = "Jeroen van Zundert", email = "mail@jeroenvanzundert.nl" }]
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["uv", "bump", "version", "dependency"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+[project.urls]
+Homepage = "https://github.com/zundertj/uv-bump"
+Repository = "https://github.com/zundertj/uv-bump.git"
+Issues = "https://github.com/zundertj/uv-bump/issues"
 
 [dependency-groups]
 dev = [
