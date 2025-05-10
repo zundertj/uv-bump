@@ -1,6 +1,6 @@
 [project]
 name = "uv-bump"
-version = "0.1.1"
+version = "0.1.2"
 description = "Bump pyproject.toml dependency minimum versions to latest feasible versions."
 readme = "README.md"
 requires-python = ">=3.9"
