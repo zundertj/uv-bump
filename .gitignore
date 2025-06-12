@@ -1,3 +1,9 @@
 .ropeproject
 *.pyc
 *.egg-info
+.ruff_cache
+.mypy_cache
+.pytest_cache
+.claude
+.python_version
+**/__pycache__/
