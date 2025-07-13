@@ -47,7 +47,7 @@ def test_upgrade(
     tmp_path: Path, lock_file_contents: str, pyproject_toml_contents: str
 ) -> None:
     lock_file = tmp_path / "uv.lock"
-    lock_file.write_text(lock_file_contents) # contents after uv-sync run
+    lock_file.write_text(lock_file_contents)  # contents after uv-sync run
 
     pyproject_file = tmp_path / "pyproject.toml"
     pyproject_file.write_text(pyproject_toml_contents)
@@ -65,7 +65,7 @@ def test_upgrade_uv_sync_exception() -> None:
     with pytest.raises(UVSyncError) as error:  # noqa: PT012, SIM117
         with patch(upgrade.__module__ + ".subprocess.run") as mock:
 
-            def run(*args, **kwargs) -> None:  # noqa: ANN002, ANN003, ARG001
+            def run(*args, **kwargs) -> None:  # type:ignore[no-untyped-def] #noqa: ANN002, ANN003, ARG001
                 raise subprocess.CalledProcessError(
                     returncode=1, cmd="", stderr="uv sync error here"
                 )
