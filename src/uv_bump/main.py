@@ -9,6 +9,18 @@ UV_SYNC_UPGRADE_MARKER = (
 )
 
 
+class UVSyncError(Exception):  # noqa: D101
+    exit_code: int
+    msg: str
+
+    def __init__(self, exit_code: int, msg: str) -> None:  # noqa: D107
+        self.exit_code = exit_code
+        self.msg = msg
+
+    def __str__(self) -> str:  # noqa: D105
+        return f"UVSyncError(exit_code={self.exit_code}, message=\n" + self.msg + ")"
+
+
 def upgrade(pyproject_toml_file: Path | None = None) -> None:
     """Upgrade minimum versions of dependencies in specified pyproject.toml."""
     if pyproject_toml_file is None:
@@ -25,12 +37,16 @@ def collect_uv_updates() -> dict[str, str]:
         dict with the package name as key and package version as value
 
     """
-    result = subprocess.run(  # noqa: S603
-        ["uv", "sync", "--upgrade", "--all-extras"],  # noqa: S607
-        check=True,
-        capture_output=True,
-        text=True,
-    )
+    try:
+        result = subprocess.run(
+            ["uv", "sync", "--upgrade", "--all-extras"],  # noqa: S607
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except subprocess.CalledProcessError as error:
+        raise UVSyncError(error.returncode, error.stderr) from error
+
     lines = result.stderr.splitlines()
     package_version_updated: dict[str, str] = {}
     for line in lines:
