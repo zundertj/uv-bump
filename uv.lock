@@ -308,7 +308,7 @@ wheels = [
 
 [[package]]
 name = "uv-bump"
-version = "0.1.2"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "tomli", marker = "python_full_version < '3.11'" },
@@ -327,8 +327,8 @@ requires-dist = [{ name = "tomli", marker = "python_full_version < '3.11'", spec
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "mypy", specifier = ">=1.15.0" },
-    { name = "pytest", specifier = ">=8.3.5" },
-    { name = "pytest-cov", specifier = ">=6.1.1" },
-    { name = "ruff", specifier = ">=0.11.9" },
+    { name = "mypy", specifier = ">=1.16.1" },
+    { name = "pytest", specifier = ">=8.4.1" },
+    { name = "pytest-cov", specifier = ">=6.2.1" },
+    { name = "ruff", specifier = ">=0.12.3" },
 ]
