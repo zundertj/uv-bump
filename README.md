@@ -18,6 +18,11 @@ Run `uv sync --all-extras` if you are unsure.
 Proceed by installing the tool and running it:
 
 ```bash
+uvx uv-bump
+```
+
+Alternatively, if you want to add uv-bump to your development dependencies:
+```bash
 uv add --dev uv-bump
 uv-bump
 ```
