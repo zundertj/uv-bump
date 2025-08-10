@@ -8,7 +8,7 @@ from pathlib import Path
 if sys.version_info >= (3, 11):
     import tomllib
 else:
-    import tomli as tomllib  # type: ignore[import-untyped]
+    import tomli as tomllib  # type: ignore[import-untyped]  # pragma: no cover
 
 
 class UVSyncError(Exception):  # noqa: D101

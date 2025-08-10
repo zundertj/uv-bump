@@ -15,7 +15,7 @@ from uv_bump.main import (
 if sys.version_info >= (3, 11):
     import tomllib
 else:
-    import tomli as tomllib  # type: ignore[import-untyped]
+    import tomli as tomllib  # type: ignore[import-untyped]  # pragma: no cover
 
 
 @pytest.fixture
