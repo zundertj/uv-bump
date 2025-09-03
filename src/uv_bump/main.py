@@ -65,7 +65,7 @@ def collect_package_versions_from_lock_file(
     """
     lock_path = pyproject_toml_file.parent / "uv.lock"
     contents = tomllib.loads(lock_path.read_text(encoding="utf-8"))
-    return {p["name"]: p["version"] for p in contents["package"]}
+    return {p["name"]: p["version"] for p in contents["package"] if "version" in p}
 
 
 def update_pyproject_toml(file: Path, package_versions: dict[str, str]) -> None:
