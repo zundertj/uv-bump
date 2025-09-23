@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "uv-bump"
-version = "0.2.0"
+version = "0.2.1"
 description = "Bump pyproject.toml dependency minimum versions to latest feasible versions."
 readme = "README.md"
 requires-python = ">=3.9"
