@@ -1,10 +1,17 @@
 import argparse
+import sys
+from collections.abc import Sequence
 from pathlib import Path
 
 from uv_bump.main import upgrade
 
 
 def cli() -> None:
+    args = parse_args(sys.argv[1:])
+    upgrade(Path(args.pyproject_toml) if args.pyproject_toml is not None else None)
+
+
+def parse_args(args: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="uv-bump",
         description=(
@@ -18,6 +25,4 @@ def cli() -> None:
         help="File to update",
     )
 
-    args = parser.parse_args()
-
-    upgrade(Path(args.pyproject_toml) if args.pyproject_toml is not None else None)
+    return parser.parse_args(args)
