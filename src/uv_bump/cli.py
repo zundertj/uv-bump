@@ -1,9 +1,12 @@
 import argparse
+import importlib.metadata
 import sys
 from collections.abc import Sequence
 from pathlib import Path
 
 from uv_bump.main import upgrade
+
+PROG = "uv-bump"
 
 
 def cli() -> None:
@@ -13,7 +16,7 @@ def cli() -> None:
 
 def parse_args(args: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        prog="uv-bump",
+        prog=PROG,
         description=(
             "UV-bump updates your pyproject.toml minimum versions to the latest"
             " feasible version"
@@ -24,5 +27,10 @@ def parse_args(args: Sequence[str]) -> argparse.Namespace:
         "--pyproject-toml",
         help="File to update",
     )
+    parser.add_argument("--version", action="version", version=f"%(prog)s {_version()}")
 
     return parser.parse_args(args)
+
+
+def _version() -> str:
+    return importlib.metadata.version(PROG)
