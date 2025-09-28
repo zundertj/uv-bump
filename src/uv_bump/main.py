@@ -101,5 +101,5 @@ def _replace_package_version(text: str, package: str, version: str) -> str:
     pattern = r'"(' + package + r'(?:\[[^\]]*\])?)(>|>=|~=)[^"`,;]+'
     replacement = r'"\1>=' + version
 
-    text, num_replacements = re.subn(pattern, replacement, text)
+    text, _ = re.subn(pattern, replacement, text)
     return text
