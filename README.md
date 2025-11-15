@@ -64,3 +64,12 @@ A2. See the issue tracker: https://github.com/astral-sh/uv/issues/6794
 Q3. Can I see which of my dependencies are outdated?
 
 A3. `uv pip list --outdated`. This does not, per Q1, mean that they can actually all be updated to the latest version.
+
+## Development
+Git checkout the repository.
+
+* Run the unit tests: `pytest`.
+* Formatting and linting is done by `ruff format .` and `ruff check .` respectively.
+* To type check the code base: `mypy`.
+
+UV is required for running tests in parallel across python versions: `make -j testall`.
