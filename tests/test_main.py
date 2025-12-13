@@ -8,6 +8,7 @@ import pytest
 from uv_bump.main import (
     UVSyncError,
     _update_pyproject_contents,
+    collect_all_pyproject_files,
     run_uv_sync,
     upgrade,
 )
@@ -59,6 +60,15 @@ def test_upgrade(
 
     result = tomllib.loads(pyproject_file.read_text())
     assert result["project"]["dependencies"] == ["polars>=1.21.0,<1.22"]
+
+
+def test_collect_all_pyproject_files() -> None:
+    resource_dir = Path(__file__).parent / "resources"
+    lock_file = resource_dir / "uv_workspaces.lock"
+    result = collect_all_pyproject_files(lock_file)
+    assert len(result) == 2  # noqa: PLR2004
+    assert resource_dir / "pyproject.toml" in result
+    assert resource_dir / "packages/my_lib/pyproject.toml" in result
 
 
 def test_upgrade_uv_sync_exception() -> None:

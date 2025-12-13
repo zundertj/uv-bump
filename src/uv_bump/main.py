@@ -10,6 +10,9 @@ if sys.version_info >= (3, 11):
 else:
     import tomli as tomllib  # type: ignore[import-untyped]  # pragma: no cover
 
+LOCK_FILE_NAME = "uv.lock"
+PYPROJECT_FILE_NAME = "pyproject.toml"
+
 
 class UVSyncError(Exception):  # noqa: D101
     exit_code: int
@@ -23,14 +26,19 @@ class UVSyncError(Exception):  # noqa: D101
         return f"UVSyncError(exit_code={self.exit_code}, message=\n" + self.msg + ")"
 
 
-def upgrade(pyproject_toml_file: Path | None = None) -> None:
+def upgrade(root_pyproject_toml_file: Path | None = None) -> None:
     """Upgrade minimum versions of dependencies in specified pyproject.toml."""
-    if pyproject_toml_file is None:
-        pyproject_toml_file = Path("pyproject.toml")
+    if root_pyproject_toml_file is None:
+        root_pyproject_toml_file = Path(PYPROJECT_FILE_NAME)
+
+    lock_path = root_pyproject_toml_file.parent / LOCK_FILE_NAME
 
     run_uv_sync()
-    package_versions = collect_package_versions_from_lock_file(pyproject_toml_file)
-    update_pyproject_toml(pyproject_toml_file, package_versions)
+
+    package_versions = collect_package_versions_from_lock_file(lock_path)
+    pyproject_files = collect_all_pyproject_files(lock_path)
+    for pyproject_file in pyproject_files:
+        update_pyproject_toml(pyproject_file, package_versions)
 
 
 def run_uv_sync() -> None:
@@ -50,22 +58,54 @@ def run_uv_sync() -> None:
         raise UVSyncError(error.returncode, error.stderr) from error
 
 
-def collect_package_versions_from_lock_file(
-    pyproject_toml_file: Path,
-) -> dict[str, str]:
+def collect_package_versions_from_lock_file(lock_path: Path) -> dict[str, str]:
     """
     Gather all dependency versions.
 
     Args:
-        pyproject_toml_file: path of the pyproject.toml file
+        lock_path: path to uv.lock file
 
     Returns:
         dict with the package name as key and package version as value
 
     """
-    lock_path = pyproject_toml_file.parent / "uv.lock"
     contents = tomllib.loads(lock_path.read_text(encoding="utf-8"))
     return {p["name"]: p["version"] for p in contents["package"] if "version" in p}
+
+
+def collect_all_pyproject_files(lock_path: Path) -> list[Path]:
+    """
+    Determine all pyproject.toml file locations in the project from uv.lock file.
+
+    Args:
+        lock_path: the full path to the lock file
+
+    Returns:
+        list of paths to pyproject.toml files
+
+    """
+    contents = tomllib.loads(lock_path.read_text(encoding="utf-8"))
+
+    if "manifest" in contents:
+        # workspaces
+        member_paths = []
+
+        for member in contents["manifest"]["members"]:
+            for pkg in contents["package"]:
+                if pkg["name"] == member:
+                    source = pkg["source"]
+                    for source_type in ["editable", "virtual"]:
+                        if source_type in source:
+                            member_paths.append(
+                                lock_path.parent
+                                / source[source_type]
+                                / PYPROJECT_FILE_NAME
+                            )
+                            continue
+
+        return member_paths
+
+    return [lock_path.parent / PYPROJECT_FILE_NAME]
 
 
 def update_pyproject_toml(file: Path, package_versions: dict[str, str]) -> None:
