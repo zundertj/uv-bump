@@ -418,7 +418,7 @@ wheels = [
 
 [[package]]
 name = "uv-bump"
-version = "0.3.2"
+version = "0.4.0"
 source = { editable = "." }
 dependencies = [
     { name = "tomli", marker = "python_full_version < '3.11'" },
