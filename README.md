@@ -34,7 +34,7 @@ Alternatively, if you want to add uv-bump to your development dependencies:
 uv add --dev uv-bump
 uv-bump
 ```
-UV-bump will run `uv sync`, which updates the packages in your virtual environment and your `uv.lock` file, and in addition updates `pyproject.toml` by bumping all minimum bounds to the version installed.
+UV-bump will run `uv sync`, which updates the packages in your virtual environment and your `uv.lock` file, and in addition updates all `pyproject.toml` files in the workspace by bumping all minimum bounds to the version installed.
 Review the changes, and when happy, commit.
 
 UV-bump will respect your currently set version pins and bounds.
