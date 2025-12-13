@@ -5,6 +5,14 @@ Bump pyproject.toml dependency minimum versions to latest feasible versions.
 WARNING: this tool is provided as-is and doesn't come with warranty.
 Please make sure your code has been backed up and/or version controlled in case something goes wrong.
 
+## Features
+* Bump your minimum bounds in `pyproject.toml` in sync with the uv.lock file automatically.
+* Hold back package upgrades by using the standard `==` syntax in `pyproject.toml`.
+* Respects your `pyproject.toml` files by keeping the formatting including comments.
+* Workspace support.
+* Speed and power of UV; uv-bump does the minimum possible on top of UV.
+* Zero config & no interactivity required, just run `uv-bump` in your projects root directory.
+* Runs on Python 3.10+ without any dependencies.
 
 ## Howto
 
