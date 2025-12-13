@@ -14,9 +14,9 @@ dependencies = [
 authors = [{ name = "Jeroen van Zundert", email = "mail@jeroenvanzundert.nl" }]
 license = "MIT"
 license-files = ["LICENSE"]
-keywords = ["uv", "bump", "version", "dependency"]
+keywords = ["uv", "bump", "version", "dependency", "upgrade", "pyproject.toml", "cli"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Build Tools",
     "Programming Language :: Python :: 3.10",
