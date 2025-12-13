@@ -7,12 +7,12 @@ Please make sure your code has been backed up and/or version controlled in case 
 
 ## Features
 * Bump your minimum bounds in `pyproject.toml` in sync with the uv.lock file automatically.
-* Hold back package upgrades by using the standard `==` syntax in `pyproject.toml`.
+* Hold back package upgrades by using the standard `==` & `<=` syntax in `pyproject.toml`.
 * Respects your `pyproject.toml` files by keeping the formatting including comments.
 * Workspace support.
 * Speed and power of UV; uv-bump does the minimum possible on top of UV.
 * Zero config & no interactivity required, just run `uv-bump` in your projects root directory.
-* Runs on Python 3.10+ without any dependencies.
+* Runs on Python 3.10+ without any dependencies other than [UV](https://github.com/astral-sh/uv).
 
 ## Howto
 
