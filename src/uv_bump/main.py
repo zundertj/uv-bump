@@ -27,10 +27,10 @@ class UVSyncError(Exception):  # noqa: D101
 
 
 def _print_changes_table(
-    before_versions: dict[str, str],
-    packages_updated: list[str],
-    lock_before: dict[str, str],
-    lock_after: dict[str, str],
+        before_versions: dict[str, str],
+        packages_updated: list[str],
+        lock_before: dict[str, str],
+        lock_after: dict[str, str],
 ) -> None:
     """Print a table showing lock file changes and pyproject.toml changes."""
     print("\tPackage\t\tLock file\t\tpyproject.toml")  # noqa: T201
@@ -48,8 +48,8 @@ def _print_changes_table(
         print("\tNo packages updated")  # noqa: T201
 
 
-def upgrade(
-    root_pyproject_toml_file: Path | None = None, *, verbose: bool = False
+def bump_pyproject(
+        root_pyproject_toml_file: Path | None = None, *, verbose: bool = False, upgrade: bool = False,
 ) -> None:
     """
     Upgrade minimum versions of dependencies in specified pyproject.toml.
@@ -58,6 +58,7 @@ def upgrade(
         root_pyproject_toml_file: main pyproject.toml file. If using workspaces, should
                                   be the root one.
         verbose: report per pyproject.toml file the package version changes made.
+        upgrade: run --upgrade as part of the uv sync
     """
     if root_pyproject_toml_file is None:
         root_pyproject_toml_file = Path(PYPROJECT_FILE_NAME)
@@ -66,7 +67,7 @@ def upgrade(
 
     lock_before = collect_package_versions_from_lock_file(lock_path)
 
-    run_uv_sync()
+    run_uv_sync(upgrade)
 
     lock_after = collect_package_versions_from_lock_file(lock_path)
 
@@ -86,15 +87,21 @@ def upgrade(
             )
 
 
-def run_uv_sync() -> None:
+def run_uv_sync(upgrade: bool) -> None:
     """
     Find package upgrades through uv sync.
 
+    Params:
+        upgrade: run --upgrade as part of the uv sync
+
     Raises UVSyncError.
     """
+    args = ["uv", "sync", "--all-extras"]
+    if upgrade:
+        args.append("--upgrade")
     try:
         subprocess.run(
-            ["uv", "sync", "--upgrade", "--all-extras"],  # noqa: S607
+            args,  # noqa: S607
             check=True,
             capture_output=True,
             text=True,
@@ -154,7 +161,7 @@ def collect_all_pyproject_files(lock_path: Path) -> list[Path]:
 
 
 def update_pyproject_toml(
-    file: Path, package_versions: dict[str, str]
+        file: Path, package_versions: dict[str, str]
 ) -> tuple[list[str], dict[str, str]]:
     """
     Update specified pyproject.toml file with minimum version bounds (>=, ~=).
@@ -176,7 +183,7 @@ def update_pyproject_toml(
 
 
 def _update_pyproject_contents(
-    contents: str, package_version_updated: dict[str, str]
+        contents: str, package_version_updated: dict[str, str]
 ) -> tuple[str, list[str], dict[str, str]]:
     package_updates = []
     before_versions = {}
@@ -192,7 +199,7 @@ def _update_pyproject_contents(
 
 
 def _replace_package_version(
-    text: str, package: str, version: str
+        text: str, package: str, version: str
 ) -> tuple[str, int, str | None]:
     # we assume the following:
     # 1. the package name is directly preceded by a double quote
