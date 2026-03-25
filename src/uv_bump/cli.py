@@ -36,8 +36,11 @@ def parse_args(args: Sequence[str]) -> argparse.Namespace:
         "-v", "--verbose", action="store_true", help="Report changes made"
     )
     parser.add_argument(
-        "-n", "--no-upgrade", action="store_false", dest="upgrade",
-        help="Don't upgrade dependencies as part of running uv sync"
+        "-n",
+        "--no-upgrade",
+        action="store_false",
+        dest="upgrade",
+        help="Don't upgrade dependencies as part of running uv sync",
     )
 
     return parser.parse_args(args)

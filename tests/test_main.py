@@ -8,9 +8,9 @@ import pytest
 from uv_bump.main import (
     UVSyncError,
     _update_pyproject_contents,
+    bump_pyproject,
     collect_all_pyproject_files,
     run_uv_sync,
-    bump_pyproject,
 )
 
 if sys.version_info >= (3, 11):
@@ -45,7 +45,7 @@ dependencies = [
 
 
 def test_upgrade(
-        tmp_path: Path, lock_file_contents: str, pyproject_toml_contents: str
+    tmp_path: Path, lock_file_contents: str, pyproject_toml_contents: str
 ) -> None:
     lock_file = tmp_path / "uv.lock"
     lock_file.write_text(lock_file_contents)  # contents after uv-sync run
@@ -89,9 +89,22 @@ source = { virtual = "." }
     assert result == [tmp_path / "pyproject.toml"]
 
 
+def test_bump_without_upgrade_uv_sync() -> None:
+    with patch(bump_pyproject.__module__ + ".subprocess.run") as mock:
+        bump_pyproject(upgrade=False)
+    assert "--upgrade" not in mock.call_args[0][0]
+
+
+def test_bump_with_upgrade_uv_sync() -> None:
+    with patch(bump_pyproject.__module__ + ".subprocess.run") as mock:
+        bump_pyproject(upgrade=True)
+    assert "--upgrade" in mock.call_args[0][0]
+
+
 def test_upgrade_uv_sync_exception() -> None:
     with pytest.raises(UVSyncError) as error:  # noqa: PT012, SIM117
         with patch(bump_pyproject.__module__ + ".subprocess.run") as mock:
+
             def run(*args, **kwargs) -> None:  # type:ignore[no-untyped-def] #noqa: ANN002, ANN003, ARG001
                 raise subprocess.CalledProcessError(
                     returncode=1, cmd="", stderr="uv sync error here"
@@ -116,11 +129,11 @@ def test_update_extras() -> None:
         "polars[sql]>=1.20",
     """
     assert (
-            '"polars[sql]>=1.21.0"'
-            in _update_pyproject_contents(
-        content,
-        {"polars": "1.21.0"},
-    )[0]
+        '"polars[sql]>=1.21.0"'
+        in _update_pyproject_contents(
+            content,
+            {"polars": "1.21.0"},
+        )[0]
     )
 
 
@@ -152,7 +165,7 @@ def test_update_keep_comment() -> None:
 
 
 def test_upgrade_verbose_shows_correct_before_after_versions(
-        tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     # Lock file content before uv sync
     lock_before = """[[package]]
@@ -190,7 +203,8 @@ dependencies = [
 
     # Mock run_uv_sync to write updated lock file
     with patch(run_uv_sync.__module__ + ".run_uv_sync") as mock_run_uv_sync:
-        def mock_sync(_upgrade: bool) -> None:
+
+        def mock_sync(*, upgrade: bool) -> None:  # noqa: ARG001
             lock_file.write_text(lock_after)
 
         mock_run_uv_sync.side_effect = mock_sync
@@ -208,10 +222,10 @@ dependencies = [
 
 
 def test_upgrade_verbose_shows_correct_before_after_from_pyproject_bug(
-        tmp_path: Path,
-        lock_file_contents: str,
-        pyproject_toml_contents: str,
-        capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+    lock_file_contents: str,
+    pyproject_toml_contents: str,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     lock_file = tmp_path / "uv.lock"
     lock_file.write_text(lock_file_contents)  # lock already has 1.21.0

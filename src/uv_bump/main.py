@@ -27,10 +27,10 @@ class UVSyncError(Exception):  # noqa: D101
 
 
 def _print_changes_table(
-        before_versions: dict[str, str],
-        packages_updated: list[str],
-        lock_before: dict[str, str],
-        lock_after: dict[str, str],
+    before_versions: dict[str, str],
+    packages_updated: list[str],
+    lock_before: dict[str, str],
+    lock_after: dict[str, str],
 ) -> None:
     """Print a table showing lock file changes and pyproject.toml changes."""
     print("\tPackage\t\tLock file\t\tpyproject.toml")  # noqa: T201
@@ -49,7 +49,10 @@ def _print_changes_table(
 
 
 def bump_pyproject(
-        root_pyproject_toml_file: Path | None = None, *, verbose: bool = False, upgrade: bool = False,
+    root_pyproject_toml_file: Path | None = None,
+    *,
+    verbose: bool = False,
+    upgrade: bool = False,
 ) -> None:
     """
     Upgrade minimum versions of dependencies in specified pyproject.toml.
@@ -67,7 +70,7 @@ def bump_pyproject(
 
     lock_before = collect_package_versions_from_lock_file(lock_path)
 
-    run_uv_sync(upgrade)
+    run_uv_sync(upgrade=upgrade)
 
     lock_after = collect_package_versions_from_lock_file(lock_path)
 
@@ -87,7 +90,7 @@ def bump_pyproject(
             )
 
 
-def run_uv_sync(upgrade: bool) -> None:
+def run_uv_sync(*, upgrade: bool = True) -> None:
     """
     Find package upgrades through uv sync.
 
@@ -100,8 +103,8 @@ def run_uv_sync(upgrade: bool) -> None:
     if upgrade:
         args.append("--upgrade")
     try:
-        subprocess.run(
-            args,  # noqa: S607
+        subprocess.run(  # noqa: S603
+            args,
             check=True,
             capture_output=True,
             text=True,
@@ -161,7 +164,7 @@ def collect_all_pyproject_files(lock_path: Path) -> list[Path]:
 
 
 def update_pyproject_toml(
-        file: Path, package_versions: dict[str, str]
+    file: Path, package_versions: dict[str, str]
 ) -> tuple[list[str], dict[str, str]]:
     """
     Update specified pyproject.toml file with minimum version bounds (>=, ~=).
@@ -183,7 +186,7 @@ def update_pyproject_toml(
 
 
 def _update_pyproject_contents(
-        contents: str, package_version_updated: dict[str, str]
+    contents: str, package_version_updated: dict[str, str]
 ) -> tuple[str, list[str], dict[str, str]]:
     package_updates = []
     before_versions = {}
@@ -199,7 +202,7 @@ def _update_pyproject_contents(
 
 
 def _replace_package_version(
-        text: str, package: str, version: str
+    text: str, package: str, version: str
 ) -> tuple[str, int, str | None]:
     # we assume the following:
     # 1. the package name is directly preceded by a double quote
