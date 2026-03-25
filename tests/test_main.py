@@ -8,9 +8,9 @@ import pytest
 from uv_bump.main import (
     UVSyncError,
     _update_pyproject_contents,
+    bump_pyproject,
     collect_all_pyproject_files,
     run_uv_sync,
-    upgrade,
 )
 
 if sys.version_info >= (3, 11):
@@ -54,7 +54,7 @@ def test_upgrade(
     pyproject_file.write_text(pyproject_toml_contents)
 
     with patch(run_uv_sync.__module__ + ".subprocess.run") as mock:
-        upgrade(pyproject_file, verbose=True)
+        bump_pyproject(pyproject_file, verbose=True)
 
     mock.assert_called_once()
 
@@ -89,9 +89,21 @@ source = { virtual = "." }
     assert result == [tmp_path / "pyproject.toml"]
 
 
+def test_bump_without_upgrade_uv_sync() -> None:
+    with patch(bump_pyproject.__module__ + ".subprocess.run") as mock:
+        bump_pyproject(upgrade=False)
+    assert "--upgrade" not in mock.call_args[0][0]
+
+
+def test_bump_with_upgrade_uv_sync() -> None:
+    with patch(bump_pyproject.__module__ + ".subprocess.run") as mock:
+        bump_pyproject(upgrade=True)
+    assert "--upgrade" in mock.call_args[0][0]
+
+
 def test_upgrade_uv_sync_exception() -> None:
     with pytest.raises(UVSyncError) as error:  # noqa: PT012, SIM117
-        with patch(upgrade.__module__ + ".subprocess.run") as mock:
+        with patch(bump_pyproject.__module__ + ".subprocess.run") as mock:
 
             def run(*args, **kwargs) -> None:  # type:ignore[no-untyped-def] #noqa: ANN002, ANN003, ARG001
                 raise subprocess.CalledProcessError(
@@ -99,7 +111,7 @@ def test_upgrade_uv_sync_exception() -> None:
                 )
 
             mock.side_effect = run
-            upgrade()
+            bump_pyproject()
 
     assert str(error.value) == "UVSyncError(exit_code=1, message=\nuv sync error here)"
 
@@ -192,12 +204,12 @@ dependencies = [
     # Mock run_uv_sync to write updated lock file
     with patch(run_uv_sync.__module__ + ".run_uv_sync") as mock_run_uv_sync:
 
-        def mock_sync() -> None:
+        def mock_sync(*, upgrade: bool) -> None:  # noqa: ARG001
             lock_file.write_text(lock_after)
 
         mock_run_uv_sync.side_effect = mock_sync
 
-        upgrade(pyproject_file, verbose=True)
+        bump_pyproject(pyproject_file, verbose=True)
         mock_run_uv_sync.assert_called_once()
 
     # Capture verbose output
@@ -222,7 +234,7 @@ def test_upgrade_verbose_shows_correct_before_after_from_pyproject_bug(
     pyproject_file.write_text(pyproject_toml_contents)
 
     with patch(run_uv_sync.__module__ + ".subprocess.run") as mock:
-        upgrade(pyproject_file, verbose=True)
+        bump_pyproject(pyproject_file, verbose=True)
 
     mock.assert_called_once()
 

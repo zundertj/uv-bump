@@ -48,8 +48,11 @@ def _print_changes_table(
         print("\tNo packages updated")  # noqa: T201
 
 
-def upgrade(
-    root_pyproject_toml_file: Path | None = None, *, verbose: bool = False
+def bump_pyproject(
+    root_pyproject_toml_file: Path | None = None,
+    *,
+    verbose: bool = False,
+    upgrade: bool = False,
 ) -> None:
     """
     Upgrade minimum versions of dependencies in specified pyproject.toml.
@@ -58,6 +61,7 @@ def upgrade(
         root_pyproject_toml_file: main pyproject.toml file. If using workspaces, should
                                   be the root one.
         verbose: report per pyproject.toml file the package version changes made.
+        upgrade: run --upgrade as part of the uv sync
     """
     if root_pyproject_toml_file is None:
         root_pyproject_toml_file = Path(PYPROJECT_FILE_NAME)
@@ -66,7 +70,7 @@ def upgrade(
 
     lock_before = collect_package_versions_from_lock_file(lock_path)
 
-    run_uv_sync()
+    run_uv_sync(upgrade=upgrade)
 
     lock_after = collect_package_versions_from_lock_file(lock_path)
 
@@ -86,15 +90,21 @@ def upgrade(
             )
 
 
-def run_uv_sync() -> None:
+def run_uv_sync(*, upgrade: bool = True) -> None:
     """
     Find package upgrades through uv sync.
 
+    Params:
+        upgrade: run --upgrade as part of the uv sync
+
     Raises UVSyncError.
     """
+    args = ["uv", "sync", "--all-extras"]
+    if upgrade:
+        args.append("--upgrade")
     try:
-        subprocess.run(
-            ["uv", "sync", "--upgrade", "--all-extras"],  # noqa: S607
+        subprocess.run(  # noqa: S603
+            args,
             check=True,
             capture_output=True,
             text=True,
