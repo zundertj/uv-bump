@@ -2,6 +2,13 @@
 
 Bump pyproject.toml dependency minimum versions to latest feasible versions.
 
+<a href="https://pypi.org/project/uv-bump">
+    <img src="https://img.shields.io/pypi/v/uv-bump?color=%2334D058&label=pypi%20package" alt="Package version">
+</a>
+<a href="https://pypi.org/project/uv-bump">
+    <img src="https://img.shields.io/pypi/pyversions/uv-bump.svg?color=%2334D058" alt="Supported Python versions">
+</a>
+
 WARNING: this tool is provided as-is and doesn't come with warranty.
 Please make sure your code has been backed up and/or version controlled in case something goes wrong.
 
