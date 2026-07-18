@@ -2,7 +2,7 @@
 .PHONY: testall
 .PRECIOUS: .venv-%/pyvenv.cfg
 
-PYTHON_VERSIONS := 3.10 3.11 3.12 3.13 3.14
+PYTHON_VERSIONS := 3.10 3.11 3.12 3.13 3.14 3.15
 TEST_TARGETS := $(addprefix .tests-,$(PYTHON_VERSIONS))
 
 testall: $(TEST_TARGETS)
@@ -12,5 +12,4 @@ testall: $(TEST_TARGETS)
 
 .tests-%: .venv-%/pyvenv.cfg
 	venv=$(patsubst .tests-%,.venv-%,$@) && \
-	source $$venv/bin/activate && \
 	uv run --active --python $$venv pytest
