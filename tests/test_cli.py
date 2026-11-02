@@ -11,11 +11,16 @@ def test_cli() -> None:
         patch("uv_bump.cli.bump_pyproject") as mock_bump,
     ):
         mock_parse_args.return_value = argparse.Namespace(
-            pyproject_toml="hello", verbose=False, upgrade=True
+            pyproject_toml="hello",
+            verbose=False,
+            upgrade=True,
+            update_unconstrained=False,
         )
         cli()
 
-    mock_bump.assert_called_once_with(Path("hello"), verbose=False, upgrade=True)
+    mock_bump.assert_called_once_with(
+        Path("hello"), verbose=False, upgrade=True, update_unconstrained=False
+    )
 
 
 def test_cli_no_upgrade() -> None:
@@ -24,18 +29,23 @@ def test_cli_no_upgrade() -> None:
         patch("uv_bump.cli.bump_pyproject") as mock_bump,
     ):
         mock_parse_args.return_value = argparse.Namespace(
-            pyproject_toml="hello", verbose=False, upgrade=False
+            pyproject_toml="hello",
+            verbose=False,
+            upgrade=False,
+            update_unconstrained=False,
         )
         cli()
 
-    mock_bump.assert_called_once_with(Path("hello"), verbose=False, upgrade=False)
+    mock_bump.assert_called_once_with(
+        Path("hello"), verbose=False, upgrade=False, update_unconstrained=False
+    )
 
 
 def test_parse_args() -> None:
     result = parse_args(["--pyproject-toml", "world"])
 
     assert result == argparse.Namespace(
-        pyproject_toml="world", verbose=False, upgrade=True
+        pyproject_toml="world", verbose=False, upgrade=True, update_unconstrained=False
     )
 
 
@@ -43,5 +53,5 @@ def test_parse_args_no_upgrade() -> None:
     result = parse_args(["--pyproject-toml", "world", "--no-upgrade"])
 
     assert result == argparse.Namespace(
-        pyproject_toml="world", verbose=False, upgrade=False
+        pyproject_toml="world", verbose=False, upgrade=False, update_unconstrained=False
     )
