@@ -244,3 +244,75 @@ def test_upgrade_verbose_shows_correct_before_after_from_pyproject_bug(
     assert "\tpolars\t\t-\t\t1.20.0 → 1.21.0" in output, (
         f"Expected version change not found in output:\n{output}"
     )
+
+
+def test_update_unconstrained() -> None:
+    content = """
+        "polars",
+    """
+    result, packages_updated, before_versions = _update_pyproject_contents(
+        content,
+        {"polars": "1.21.0"},
+        update_unconstrained=True,
+    )
+
+    assert '"polars>=1.21.0"' in result
+    assert packages_updated == ["polars"]
+    assert before_versions == {}
+
+
+def test_update_unconstrained_disabled() -> None:
+    content = """
+        "polars",
+    """
+    result, packages_updated, before_versions = _update_pyproject_contents(
+        content,
+        {"polars": "1.21.0"},
+    )
+
+    assert '"polars",' in result
+    assert packages_updated == []
+    assert before_versions == {}
+
+
+def test_update_unconstrained_extras() -> None:
+    content = """
+        "polars[sql]",
+    """
+    result, packages_updated, _ = _update_pyproject_contents(
+        content,
+        {"polars": "1.21.0"},
+        update_unconstrained=True,
+    )
+
+    assert '"polars[sql]>=1.21.0"' in result
+    assert packages_updated == ["polars"]
+
+
+def test_update_unconstrained_environment_marker() -> None:
+    content = """
+        "polars; python_version >= '3.10'",
+    """
+    result, packages_updated, _ = _update_pyproject_contents(
+        content,
+        {"polars": "1.21.0"},
+        update_unconstrained=True,
+    )
+
+    assert "\"polars>=1.21.0; python_version >= '3.10'\"" in result
+    assert packages_updated == ["polars"]
+
+
+def test_update_constrained_with_update_unconstrained() -> None:
+    content = """
+        "polars>=1.20.0,<1.22",
+    """
+    result, packages_updated, before_versions = _update_pyproject_contents(
+        content,
+        {"polars": "1.21.0"},
+        update_unconstrained=True,
+    )
+
+    assert '"polars>=1.21.0,<1.22"' in result
+    assert packages_updated == ["polars"]
+    assert before_versions == {"polars": "1.20.0"}
