@@ -15,6 +15,7 @@ def cli() -> None:
         Path(args.pyproject_toml) if args.pyproject_toml is not None else None,
         verbose=args.verbose,
         upgrade=args.upgrade,
+        update_unconstrained=args.update_unconstrained,
     )
 
 
@@ -41,6 +42,11 @@ def parse_args(args: Sequence[str]) -> argparse.Namespace:
         action="store_false",
         dest="upgrade",
         help="Don't upgrade dependencies as part of running uv sync",
+    )
+    parser.add_argument(
+        "--update-unconstrained",
+        action="store_true",
+        help="Also add minimum version constraints to unconstrained dependencies",
     )
 
     return parser.parse_args(args)

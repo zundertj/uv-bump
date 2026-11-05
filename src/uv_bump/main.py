@@ -53,6 +53,7 @@ def bump_pyproject(
     *,
     verbose: bool = False,
     upgrade: bool = False,
+    update_unconstrained: bool = False,
 ) -> None:
     """
     Upgrade minimum versions of dependencies in specified pyproject.toml.
@@ -62,6 +63,8 @@ def bump_pyproject(
                                   be the root one.
         verbose: report per pyproject.toml file the package version changes made.
         upgrade: run --upgrade as part of the uv sync
+        update_unconstrained: Add minimum version constraints to dependencies without
+                              existing version constraints.
     """
     if root_pyproject_toml_file is None:
         root_pyproject_toml_file = Path(PYPROJECT_FILE_NAME)
@@ -77,7 +80,9 @@ def bump_pyproject(
     pyproject_files = collect_all_pyproject_files(lock_path)
     for pyproject_file in pyproject_files:
         packages_updated, before_versions = update_pyproject_toml(
-            pyproject_file, lock_after
+            pyproject_file,
+            lock_after,
+            update_unconstrained=update_unconstrained,
         )
 
         if verbose:
@@ -164,7 +169,10 @@ def collect_all_pyproject_files(lock_path: Path) -> list[Path]:
 
 
 def update_pyproject_toml(
-    file: Path, package_versions: dict[str, str]
+    file: Path,
+    package_versions: dict[str, str],
+    *,
+    update_unconstrained: bool = False,
 ) -> tuple[list[str], dict[str, str]]:
     """
     Update specified pyproject.toml file with minimum version bounds (>=, ~=).
@@ -179,20 +187,28 @@ def update_pyproject_toml(
     """
     contents = file.read_text(encoding="utf-8")
     contents_updated, packages_updated, before_versions = _update_pyproject_contents(
-        contents, package_versions
+        contents,
+        package_versions,
+        update_unconstrained=update_unconstrained,
     )
     file.write_text(contents_updated, encoding="utf-8")
     return packages_updated, before_versions
 
 
 def _update_pyproject_contents(
-    contents: str, package_version_updated: dict[str, str]
+    contents: str,
+    package_version_updated: dict[str, str],
+    *,
+    update_unconstrained: bool = False,
 ) -> tuple[str, list[str], dict[str, str]]:
     package_updates = []
     before_versions = {}
     for package, version in package_version_updated.items():
         contents, count, before_version = _replace_package_version(
-            contents, package, version
+            contents,
+            package,
+            version,
+            update_unconstrained=update_unconstrained,
         )
         if count > 0:
             package_updates.append(package)
@@ -202,7 +218,11 @@ def _update_pyproject_contents(
 
 
 def _replace_package_version(
-    text: str, package: str, version: str
+    text: str,
+    package: str,
+    version: str,
+    *,
+    update_unconstrained: bool = False,
 ) -> tuple[str, int, str | None]:
     # we assume the following:
     # 1. the package name is directly preceded by a double quote
@@ -221,6 +241,22 @@ def _replace_package_version(
     before_version = match.group(3).strip() if match else None
 
     text_updated = re.sub(pattern, replacement, text)
+
+    if update_unconstrained:
+        # Match dependencies without an existing version constraint.
+        unconstrained_pattern = (
+            r"(?m)(?P<prefix>^[ \t]*|(?<=[,\[])[ \t]*)"
+            r'"(?P<package>' + escaped_package + r"(?:\[[^\]]*\])?)"
+            r'(?=\s*(?:;|"))'
+        )
+
+        text_updated = re.sub(
+            unconstrained_pattern,
+            lambda match: (
+                f'{match.group("prefix")}"{match.group("package")}>={version}'
+            ),
+            text_updated,
+        )
 
     # we count the number of lines changed, rather than using re.subn, as re.subn still
     # reports changes due to the dynamic pattern
